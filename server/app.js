@@ -83,7 +83,6 @@ app.post('/signup',
 
     return models.Users.get({username})
       .then(comparison => {
-        console.log('comp', comparison)
         if (comparison) { res.redirect(303, '/signup'); }
       })
       .then(data => {
@@ -96,6 +95,27 @@ app.post('/signup',
       .error(error => {
         res.status(500).send(error);
       });
+  });
+
+app.post('/login',
+  (req, res, next) => {
+    var username = req.body.username;
+    var password = req.body.password;
+
+    return models.Users.get({username})
+      .then(comparison => {
+        if (comparison.password === password) {
+          res.redirect(303, '/');
+        }
+      })
+      .then(() => {
+        res.status(200).send();
+      })
+      .error(error => {
+        res.status(500).send(error);
+      });
+
+
   });
 
 /************************************************************/
