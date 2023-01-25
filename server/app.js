@@ -104,18 +104,22 @@ app.post('/login',
 
     return models.Users.get({username})
       .then(comparison => {
-        if (comparison.password === password) {
-          res.redirect(303, '/');
+        if (!comparison) {
+          res.redirect(303, '/login');
+        } else {
+          if (models.Users.compare(password, comparison.password, comparison.salt)) {
+            res.redirect(303, '/');
+          } else {
+            res.redirect(303, '/login');
+          }
         }
       })
-      .then(() => {
+      .then(data => {
         res.status(200).send();
       })
       .error(error => {
         res.status(500).send(error);
       });
-
-
   });
 
 /************************************************************/
