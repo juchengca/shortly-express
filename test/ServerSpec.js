@@ -391,7 +391,6 @@ describe('', function() {
 
         createSession(requestWithoutCookie, response, function() {
           var cookies = response.cookies;
-          console.log('cooks', cookies);
           expect(cookies['shortlyid']).to.exist;
           expect(cookies['shortlyid'].value).to.exist;
           done();
@@ -455,6 +454,7 @@ describe('', function() {
 
               createSession(requestWithCookies, secondResponse, function() {
                 var session = requestWithCookies.session;
+                console.log('sesh', session);
                 expect(session).to.be.an('object');
                 expect(session.user.username).to.eq(username);
                 expect(session.userId).to.eq(userId);
@@ -481,7 +481,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Sessions and cookies', function() {
+  describe('Sessions and cookies', function() {
     var requestWithSession;
     var cookieJar;
 
@@ -509,8 +509,10 @@ describe('', function() {
       requestWithSession('http://127.0.0.1:4568/', function(err, res, body) {
         if (err) { return done(err); }
         var queryString = 'SELECT * FROM sessions';
+        console.log('db', db);
         db.query(queryString, function(error, sessions) {
           if (error) { return done(error); }
+          console.log('sesh', sessions);
           expect(sessions.length).to.equal(1);
           expect(sessions[0].userId).to.be.null;
           done();
