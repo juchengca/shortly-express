@@ -1,23 +1,24 @@
 const parseCookies = (req, res, next) => {
-  console.log('cooks', req.headers.cookie);
   var sessionCookies = req.headers.cookie;
 
   if (!sessionCookies) {
     return {};
   }
 
-//fix object storage / extra spaces
-
   var splitCookies = sessionCookies.split(';');
-  console.log(splitCookies);
+
   for (var i = 0; i < splitCookies.length; i++) {
     for (var j = 0; j < splitCookies[i].length; j++) {
       if (splitCookies[i][j] === '=') {
-        req.cookies[splitCookies[i].slice(0, j)] = splitCookies[i].slice(j, splitCookies[i].length - 1);
+        if (i === 0) {
+          req.cookies[splitCookies[i].slice(0, j)] = splitCookies[i].slice(j + 1, splitCookies[i].length);
+        } else {
+          req.cookies[splitCookies[i].slice(1, j)] = splitCookies[i].slice(j + 1, splitCookies[i].length);
+        }
       }
     }
   }
-  console.log('rc', req.cookies)
+  next();
 };
 
 module.exports = parseCookies;
