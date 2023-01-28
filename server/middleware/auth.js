@@ -2,20 +2,22 @@ const models = require('../models');
 const Promise = require('bluebird');
 
 module.exports.createSession = (req, res, next) => {
-  console.log(req.headers);
-
-  //CHECKING COOKIES IN 2 PLACES?
-
   if (!req.hasOwnProperty('cookies')) {
+    req.cookies = {};
+    res.cookies = {};
+  }
+
+  if (Object.keys(req.cookies).length === 0) {
     return models.Sessions.create()
       .then(data => {
         return models.Sessions.get({id: data.insertId});
       })
       .then(user => {
-        console.log('tu', user);
         req.session = user;
-        var shortlyid = {value: user.hash};
-        res.cookies['shortlyid'] = shortlyid;
+        res.cookie('shortlyid', user.hash);
+        return models.Sessions.update({id: user.id}, {userId: req.session.id});
+      })
+      .then(update => {
         next();
       })
       .error(error => {
@@ -34,8 +36,10 @@ module.exports.createSession = (req, res, next) => {
             })
             .then(user => {
               req.session = user;
-              var shortlyid = {value: user.hash};
-              res.cookies['shortlyid'] = shortlyid;
+              // var shortlyid = {value: user.hash};
+              // res.cookies['shortlyid'] = shortlyid;
+              models.Sessions.update({userId: req.session.id});
+              res.cookie('shortlyid', user.hash);
               next();
             })
             .error(error => {
@@ -52,4 +56,3 @@ module.exports.createSession = (req, res, next) => {
 /************************************************************/
 // Add additional authentication middleware functions below
 /************************************************************/
-
